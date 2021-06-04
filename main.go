@@ -23,7 +23,13 @@ func usage() {
 func main() {
 	flag.Usage = usage
 	flag.Parse()
-	if len(*dir) == 0 || len(*output) == 0 {
+	_, err := os.Stat(*dir)
+	if err != nil {
+		flag.Usage()
+		os.Exit(2)
+	}
+	_, err = os.Stat(*output)
+	if err != nil {
 		flag.Usage()
 		os.Exit(2)
 	}
