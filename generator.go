@@ -85,12 +85,6 @@ func (g *Generator) parseFiles() []*parseFile {
 		ast.Inspect(f, func(node ast.Node) bool {
 			switch t := node.(type) {
 			case *ast.FuncDecl:
-				if t.Recv.NumFields() != 1 {
-					return true
-				}
-				if _, ok := t.Recv.List[0].Type.(*ast.StructType); !ok {
-					return true
-				}
 				if t.Doc == nil || t.Doc.List == nil {
 					return true
 				}
@@ -123,8 +117,9 @@ func (g *Generator) buildPrepare(pkgPath []string) {
 		g.Printf("\"%s\"\n", p)
 	}
 	g.Printf(")\n")
-	g.Printf("func Register() *gin.Engine {\n")
-	g.Printf("engine := gin.Default()\n")
+	g.Printf("var engine *gin.Engine\n")
+	g.Printf("func init() {\n")
+	g.Printf("engine = gin.Default()\n")
 }
 
 func (g *Generator) format() []byte {
@@ -138,7 +133,9 @@ func (g *Generator) format() []byte {
 }
 
 func (g *Generator) buildEnd() {
-	g.Printf("return engine\n")
+	g.Printf("}\n")
+	g.Printf("func GinEngine() *gin.Engine {\n")
+	g.Printf("return engine \n")
 	g.Printf("}\n")
 }
 
