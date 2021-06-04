@@ -46,7 +46,7 @@ func (g *Generator) generate(dir string) {
 	g.buildEnd()
 	src := g.format()
 	// 确认生成文件
-	outputFile := path.Join(g.output, "register.go")
+	outputFile := path.Join(g.output, "api.go")
 	// 输出到指定文件
 	err := os.WriteFile(outputFile, src, 0644)
 	if err != nil {

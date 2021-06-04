@@ -1,7 +1,10 @@
 package main
 
+import "strings"
+
 type function struct {
 	name         string
+	usage        string
 	isMiddleware bool
 	tags         []*tag
 }
@@ -9,7 +12,11 @@ type function struct {
 func newFunction(name string, comments []string) *function {
 	tags := make([]*tag, 0)
 	isMiddleware := false
+	u := ""
 	for _, comment := range comments {
+		if strings.Contains(comment, name) {
+			u = comment
+		}
 		if t := extractToTag(comment); t != nil {
 			if t.typ == middleware {
 				t.value = name
@@ -23,6 +30,7 @@ func newFunction(name string, comments []string) *function {
 	return &function{
 		name:         name,
 		tags:         tags,
+		usage:        u,
 		isMiddleware: isMiddleware,
 	}
 }

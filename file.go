@@ -33,7 +33,7 @@ func (p *parseFile) parse() {
 		if function.isMiddleware {
 			continue
 		}
-		r := &ginRouter{}
+		r := &ginRouter{usage: function.usage}
 		_, r.pkg = path.Split(p.pkg)
 		g := defaultGroup
 		for _, t := range function.tags {

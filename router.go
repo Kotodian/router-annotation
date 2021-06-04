@@ -8,6 +8,7 @@ type ginRouter struct {
 	path       string
 	method     string
 	pkg        string
+	usage      string
 }
 
 const (
@@ -37,6 +38,7 @@ func (g *Generator) buildRouter(f []*parseFile) {
 				if r.middleware != "" {
 					//todo: 加入中间件
 				} else {
+					g.Printf("%s\n", r.usage)
 					g.Printf("%sGroup.%s(\"%s\",%s.%s)\n", groupName, r.method, r.path, r.pkg, r.function.name)
 				}
 			}
@@ -44,6 +46,7 @@ func (g *Generator) buildRouter(f []*parseFile) {
 			g.Printf("\n")
 		} else {
 			for _, r := range routers {
+				g.Printf("%s\n", r.usage)
 				g.Printf("engine.%s(\"%s\",%s.%s)\n", r.method, r.path, r.pkg, r.function.name)
 			}
 		}
