@@ -120,6 +120,7 @@ func (g *Generator) buildPrepare(pkgPath []string) {
 	g.Printf("var engine *gin.Engine\n")
 	g.Printf("func init() {\n")
 	g.Printf("engine = gin.Default()\n")
+	g.Printf("\n")
 }
 
 func (g *Generator) format() []byte {

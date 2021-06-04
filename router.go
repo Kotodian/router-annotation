@@ -30,6 +30,7 @@ func (g *Generator) buildRouter(f []*parseFile) {
 	for group, routers := range groupRouter {
 		if group != defaultGroup {
 			_, groupName := path.Split(group)
+			g.Printf("\n")
 			g.Printf("%sGroup := engine.Group(\"%s\")\n", groupName, group)
 			g.Printf("{\n")
 			for _, r := range routers {
@@ -40,6 +41,7 @@ func (g *Generator) buildRouter(f []*parseFile) {
 				}
 			}
 			g.Printf("}\n")
+			g.Printf("\n")
 		} else {
 			for _, r := range routers {
 				g.Printf("engine.%s(\"%s\",%s.%s)\n", r.method, r.path, r.pkg, r.function.name)
