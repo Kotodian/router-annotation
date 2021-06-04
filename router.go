@@ -31,15 +31,15 @@ func (g *Generator) buildRouter(f []*parseFile) {
 		if group != defaultGroup {
 			_, groupName := path.Split(group)
 			g.Printf("%sGroup := engine.Group(\"%s\")\n", groupName, group)
+			g.Printf("{\n")
 			for _, r := range routers {
-				g.Printf("{\n")
 				if r.middleware != "" {
 					//todo: 加入中间件
 				} else {
 					g.Printf("%sGroup.%s(\"%s\",%s.%s)\n", groupName, r.method, r.path, r.pkg, r.function.name)
 				}
-				g.Printf("}\n")
 			}
+			g.Printf("}\n")
 		} else {
 			for _, r := range routers {
 				g.Printf("engine.%s(\"%s\",%s.%s)\n", r.method, r.path, r.pkg, r.function.name)
