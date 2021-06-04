@@ -13,7 +13,7 @@ var (
 )
 
 func usage() {
-	_, _ = fmt.Fprintf(os.Stderr, "Usage of router-gen:\n")
+	_, _ = fmt.Fprintf(os.Stderr, "Usage of router-annotation:\n")
 	_, _ = fmt.Fprintf(os.Stderr, "	@router: router path\n")
 	_, _ = fmt.Fprintf(os.Stderr, "	@method: http method\n")
 	_, _ = fmt.Fprintf(os.Stderr, "	@group: router group\n")
