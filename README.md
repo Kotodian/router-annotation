@@ -2,7 +2,7 @@
 
 this package only support 
 
-[GIN]: https://github.com/gin-gonic/gin
+[GIN]: https://github.com/gin-gonic/gin	"gin"
 
 please use this package like the example
 
