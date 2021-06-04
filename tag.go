@@ -34,6 +34,9 @@ type tag struct {
 
 // newTag 实例化一个tag
 func newTag(typ tagType, value string) *tag {
+	if typ == method {
+		value = strings.ToUpper(value)
+	}
 	if !validTag(typ, value) {
 		return nil
 	}
@@ -45,6 +48,8 @@ func newTag(typ tagType, value string) *tag {
 
 // extractToTag 解析注释生成一个tag
 func extractToTag(comment string) *tag {
+	comment = strings.TrimLeft(comment, "//")
+	comment = trimSpace(comment)
 	// middleware无值 特殊处理
 	if comment == string(middleware) {
 		return &tag{typ: middleware}
@@ -57,14 +62,14 @@ func extractToTag(comment string) *tag {
 	if !validComment(_tag[0]) {
 		return nil
 	}
-	// 去除值的空格
-	_tag[1] = strings.TrimSpace(_tag[1])
+
 	// 生成tag
 	return newTag(tagType(_tag[0]), _tag[1])
 }
 
 func validTag(typ tagType, value string) bool {
 	if typ == method {
+
 		if value == http.MethodGet ||
 			value == http.MethodConnect ||
 			value == http.MethodHead ||
@@ -73,7 +78,9 @@ func validTag(typ tagType, value string) bool {
 			value == http.MethodPatch ||
 			value == http.MethodDelete {
 			return true
+		} else {
+			return false
 		}
 	}
-	return false
+	return true
 }
