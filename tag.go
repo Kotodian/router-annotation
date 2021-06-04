@@ -8,11 +8,10 @@ import (
 type tagType string
 
 const (
-	router     tagType = "@router"
-	middleware tagType = "@middleware"
-	group      tagType = "@group"
-	method     tagType = "@method"
-	use        tagType = "@use"
+	router tagType = "@router"
+	group  tagType = "@group"
+	method tagType = "@method"
+	use    tagType = "@use"
 )
 
 func validComment(comment string) bool {
@@ -50,10 +49,6 @@ func newTag(typ tagType, value string) *tag {
 func extractToTag(comment string) *tag {
 	comment = strings.TrimLeft(comment, "//")
 	comment = trimSpace(comment)
-	// middleware无值 特殊处理
-	if comment == string(middleware) {
-		return &tag{typ: middleware}
-	}
 	_tag := strings.Split(comment, ":")
 	// 如果没有
 	if len(_tag) == 0 {

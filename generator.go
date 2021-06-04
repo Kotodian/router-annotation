@@ -84,6 +84,22 @@ func (g *Generator) parseFiles() []*parseFile {
 		funcs := make([]*function, 0)
 		ast.Inspect(f, func(node ast.Node) bool {
 			switch t := node.(type) {
+			case *ast.GenDecl:
+				if t.Tok == token.CONST {
+					for _, spec := range t.Specs {
+						constSpec := spec.(*ast.ValueSpec)
+						if constSpec.Doc == nil || constSpec.Doc.List == nil {
+							continue
+						}
+						_comments := constSpec.Doc.List
+						comments := make([]string, 0)
+						for _, comment := range _comments {
+							comments = append(comments, comment.Text)
+						}
+						g := newGinGroup(constSpec.Names[0].Name, constSpec.Values[0].(*ast.BasicLit).Value, parseFile.pkg, comments)
+						groups = append(groups, g)
+					}
+				}
 			case *ast.FuncDecl:
 				if t.Doc == nil || t.Doc.List == nil {
 					return true
@@ -94,7 +110,9 @@ func (g *Generator) parseFiles() []*parseFile {
 					comments = append(comments, comment.Text)
 				}
 				function := newFunction(t.Name.Name, comments)
-				funcs = append(funcs, function)
+				if function != nil {
+					funcs = append(funcs, function)
+				}
 			}
 			return true
 		})

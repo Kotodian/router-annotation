@@ -1,14 +1,23 @@
 package main
 
-import "path"
+import (
+	"strings"
+)
 
 type ginRouter struct {
-	middleware string
-	function   *function
-	path       string
-	method     string
-	pkg        string
-	usage      string
+	middlewares []string
+	function    *function
+	path        string
+	method      string
+	pkg         string
+	usage       string
+}
+
+func (r *ginRouter) middleware() string {
+	if len(r.middlewares) == 0 {
+		return ""
+	}
+	return strings.Join(r.middlewares, ",")
 }
 
 const (
@@ -30,16 +39,22 @@ func (g *Generator) buildRouter(f []*parseFile) {
 	}
 	for group, routers := range groupRouter {
 		if group != defaultGroup {
-			_, groupName := path.Split(group)
+			groupWrapper := findGroupByName(group)
+			if groupWrapper == nil {
+				continue
+			}
 			g.Printf("\n")
-			g.Printf("%sGroup := engine.Group(\"%s\")\n", groupName, group)
+			g.Printf("%sGroup := engine.Group(%s)\n", firstLower(groupWrapper.name), groupWrapper.withPkgName())
+			if len(groupWrapper.middlewares) > 0 {
+				g.Printf("%sGroup.Use(%s)\n", firstLower(groupWrapper.name), groupWrapper.middleware())
+			}
 			g.Printf("{\n")
 			for _, r := range routers {
-				if r.middleware != "" {
-					//todo: 加入中间件
+				g.Printf("%s\n", r.usage)
+				if len(r.middlewares) != 0 {
+					g.Printf("%sGroup.%s(\"%s\", %s, %s.%s)\n", firstLower(groupWrapper.name), r.method, r.path, r.middleware(), r.pkg, r.function.name)
 				} else {
-					g.Printf("%s\n", r.usage)
-					g.Printf("%sGroup.%s(\"%s\",%s.%s)\n", groupName, r.method, r.path, r.pkg, r.function.name)
+					g.Printf("%sGroup.%s(\"%s\",%s.%s)\n", firstLower(groupWrapper.name), r.method, r.path, r.pkg, r.function.name)
 				}
 			}
 			g.Printf("}\n")
@@ -47,7 +62,12 @@ func (g *Generator) buildRouter(f []*parseFile) {
 		} else {
 			for _, r := range routers {
 				g.Printf("%s\n", r.usage)
-				g.Printf("engine.%s(\"%s\",%s.%s)\n", r.method, r.path, r.pkg, r.function.name)
+				if len(r.middlewares) != 0 {
+					g.Printf("%s\n", r.usage)
+					g.Printf("engine.%s(\"%s\", %s, %s.%s)\n", r.method, r.path, r.middleware(), r.pkg, r.function.name)
+				} else {
+					g.Printf("engine.%s(\"%s\",%s.%s)\n", r.method, r.path, r.pkg, r.function.name)
+				}
 			}
 		}
 	}

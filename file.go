@@ -2,6 +2,7 @@ package main
 
 import (
 	"path"
+	"strings"
 )
 
 type parseFile struct {
@@ -29,11 +30,7 @@ func newParseFile(filepath string) *parseFile {
 func (p *parseFile) parse() {
 	// 确认所有路由组
 	for _, function := range p.funcs {
-		// 如果是中间件 就跳过
-		if function.isMiddleware {
-			continue
-		}
-		r := &ginRouter{usage: function.usage}
+		r := &ginRouter{usage: function.usage, middlewares: make([]string, 0)}
 		_, r.pkg = path.Split(p.pkg)
 		g := defaultGroup
 		for _, t := range function.tags {
@@ -54,7 +51,10 @@ func (p *parseFile) parse() {
 			}
 			// 确认中间件
 			if t.typ == use {
-				r.middleware = t.value
+				r.middlewares = strings.Split(t.value, ",")
+				for i := range r.middlewares {
+					r.middlewares[i] = r.pkg + "." + r.middlewares[i]
+				}
 			}
 		}
 		r.function = function
